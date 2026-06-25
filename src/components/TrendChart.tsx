@@ -30,7 +30,7 @@ export default function TrendChart({ data }: { data: TrendData[] }) {
   }));
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow border border-gray-100 w-full h-[400px]">
+    <div className="w-full h-full">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={formattedData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
