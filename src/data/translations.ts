@@ -1,6 +1,11 @@
 // Static mapping of Nepali vegetable/fruit names to English
 // This is used for bilingual display and search on the frontend
 
+// Debug: Log that this module loaded
+if (typeof window !== 'undefined') {
+  console.error('📍 translations.ts module loaded on client');
+}
+
 const translations: Record<string, string> = {
   "अदुवा": "Ginger",
   "अनार": "Pomegranate",
