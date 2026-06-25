@@ -184,4 +184,23 @@ export function searchMatches(nepaliName: string, searchTerm: string): boolean {
   return false;
 }
 
+// Initialize debug object for testing in browser console
+if (typeof window !== 'undefined') {
+  const debugObj = {
+    total: Object.keys(translations).length,
+    keys: Object.keys(translations).slice(0, 10),
+    allKeys: Object.keys(translations),
+    test: (name: string) => {
+      const result = getEnglishName(name);
+      console.log(`Looking up: "${name}"`);
+      console.log(`Result: "${result}"`);
+      console.log(`Character codes of input: ${[...name].map((c, i) => `${i}:${c.charCodeAt(0)}`).join(', ')}`);
+      return result;
+    },
+    testDirect: (name: string) => translations[name] || 'NOT IN DIRECT OBJECT'
+  };
+  (window as any).DEBUG_TRANSLATIONS = debugObj;
+  console.error('✅ DEBUG_TRANSLATIONS ready. Try: DEBUG_TRANSLATIONS.test("अदुवा")');
+}
+
 export default translations;
