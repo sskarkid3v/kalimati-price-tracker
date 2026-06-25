@@ -65,7 +65,10 @@ export default function PriceList({ rawData }: { rawData: TrendData[] }) {
 
   const filteredItems = items.filter((p) => {
     if (!search) return true;
-    return searchMatches(p.name, search);
+    // Check both Nepali name and English name
+    const nepaliMatch = searchMatches(p.name, search);
+    const englishMatch = p.name_en && p.name_en.toLowerCase().includes(search.toLowerCase());
+    return nepaliMatch || englishMatch;
   });
 
   const totalItems = filteredItems.length;
@@ -128,15 +131,17 @@ export default function PriceList({ rawData }: { rawData: TrendData[] }) {
                   onClick={() => setExpandedItem(isExpanded ? null : item.name)}
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-bold text-gray-900 text-base truncate">
-                        {item.name_en || item.name}
-                      </h3>
-                      {item.name_en && (
-                        <span className="text-xs text-gray-400 font-normal truncate">
-                          {item.name}
-                        </span>
-                      )}
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-bold text-gray-900 text-base">
+                          {item.name_en || item.name}
+                        </h3>
+                        {item.name_en && (
+                          <span className="text-xs text-gray-500 font-medium">
+                            ({item.name})
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div className="flex items-center gap-3 mt-2">
                       <span className="text-xl font-extrabold text-gray-900">

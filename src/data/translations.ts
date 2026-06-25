@@ -124,11 +124,26 @@ export function getEnglishName(nepaliName: string): string {
 export function searchMatches(nepaliName: string, searchTerm: string): boolean {
   const term = searchTerm.toLowerCase().trim();
   if (!term) return true;
-  // Match against Nepali name
-  if (nepaliName.toLowerCase().includes(term)) return true;
+  
+  // Normalize Nepali name for comparison
+  const nepaliNormalized = nepaliName.trim().toLowerCase();
+  const nepaliNFC = nepaliName.normalize("NFC").trim().toLowerCase();
+  const nepaliNFD = nepaliName.normalize("NFD").trim().toLowerCase();
+  const termNFC = searchTerm.normalize("NFC").toLowerCase().trim();
+  const termNFD = searchTerm.normalize("NFD").toLowerCase().trim();
+  
+  // Match against Nepali name (with normalization)
+  if (nepaliNormalized.includes(term)) return true;
+  if (nepaliNFC.includes(termNFC)) return true;
+  if (nepaliNFD.includes(termNFD)) return true;
+  
   // Match against English translation
   const english = getEnglishName(nepaliName);
-  if (english && english.toLowerCase().includes(term)) return true;
+  if (english) {
+    const englishLower = english.toLowerCase();
+    if (englishLower.includes(term)) return true;
+  }
+  
   return false;
 }
 
