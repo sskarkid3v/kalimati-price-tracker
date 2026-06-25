@@ -1,5 +1,6 @@
 // Static mapping of Nepali vegetable/fruit names to English
 // This is used for bilingual display and search on the frontend
+
 const translations: Record<string, string> = {
   "अदुवा": "Ginger",
   "अनार": "Pomegranate",
@@ -102,16 +103,31 @@ const translations: Record<string, string> = {
   "हरियो फर्सी(डल्लो)": "Green Pumpkin (Round)",
 };
 
+// Build a normalized lookup map at module load time
+// This handles Unicode normalization (NFC/NFD) differences
+const normalizedMap: Map<string, string> = new Map();
+for (const [key, value] of Object.entries(translations)) {
+  normalizedMap.set(key.normalize("NFC").trim(), value);
+  normalizedMap.set(key.normalize("NFD").trim(), value);
+}
+
 export function getEnglishName(nepaliName: string): string {
-  return translations[nepaliName] || "";
+  // Direct lookup first
+  if (translations[nepaliName]) return translations[nepaliName];
+  // Normalized lookup
+  const trimmed = nepaliName.trim();
+  return normalizedMap.get(trimmed.normalize("NFC")) 
+      || normalizedMap.get(trimmed.normalize("NFD")) 
+      || "";
 }
 
 export function searchMatches(nepaliName: string, searchTerm: string): boolean {
-  const term = searchTerm.toLowerCase();
+  const term = searchTerm.toLowerCase().trim();
+  if (!term) return true;
   // Match against Nepali name
   if (nepaliName.toLowerCase().includes(term)) return true;
   // Match against English translation
-  const english = translations[nepaliName];
+  const english = getEnglishName(nepaliName);
   if (english && english.toLowerCase().includes(term)) return true;
   return false;
 }
