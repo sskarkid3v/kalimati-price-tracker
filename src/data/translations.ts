@@ -115,11 +115,24 @@ for (const [key, value] of Object.entries(translations)) {
   normalizedMapNFD.set(keyNFD, value);
 }
 
+// Log translation map size for debugging
+if (typeof window !== 'undefined') {
+  console.log('Translations initialized:', {
+    total_translations: Object.keys(translations).length,
+    nfc_map_size: normalizedMapNFC.size,
+    nfd_map_size: normalizedMapNFD.size,
+    sample_keys: Object.keys(translations).slice(0, 5)
+  });
+}
+
 export function getEnglishName(nepaliName: string): string {
   if (!nepaliName) return "";
   
   // Direct lookup first
-  if (translations[nepaliName]) return translations[nepaliName];
+  if (translations[nepaliName]) {
+    console.log(`Direct lookup match: "${nepaliName}" -> "${translations[nepaliName]}"`);
+    return translations[nepaliName];
+  }
   
   // Normalized lookups
   const trimmed = nepaliName.trim();
@@ -127,18 +140,28 @@ export function getEnglishName(nepaliName: string): string {
   const nfd = trimmed.normalize("NFD");
   
   // Try NFC map
-  if (normalizedMapNFC.has(nfc)) return normalizedMapNFC.get(nfc) || "";
+  if (normalizedMapNFC.has(nfc)) {
+    const result = normalizedMapNFC.get(nfc) || "";
+    console.log(`NFC lookup match: "${nepaliName}" -> "${result}"`);
+    return result;
+  }
   
   // Try NFD map
-  if (normalizedMapNFD.has(nfd)) return normalizedMapNFD.get(nfd) || "";
+  if (normalizedMapNFD.has(nfd)) {
+    const result = normalizedMapNFD.get(nfd) || "";
+    console.log(`NFD lookup match: "${nepaliName}" -> "${result}"`);
+    return result;
+  }
   
   // Last resort: try case-insensitive fuzzy matching
   for (const [key, value] of Object.entries(translations)) {
     if (key.trim().toLowerCase() === trimmed.toLowerCase()) {
+      console.log(`Fuzzy lookup match: "${nepaliName}" -> "${value}"`);
       return value;
     }
   }
   
+  console.log(`NO MATCH found for: "${nepaliName}"`);
   return "";
 }
 
