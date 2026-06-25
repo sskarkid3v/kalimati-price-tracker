@@ -115,14 +115,14 @@ for (const [key, value] of Object.entries(translations)) {
   normalizedMapNFD.set(keyNFD, value);
 }
 
-// Log translation map size for debugging
+// Global logging for debugging
 if (typeof window !== 'undefined') {
-  console.log('Translations initialized:', {
-    total_translations: Object.keys(translations).length,
-    nfc_map_size: normalizedMapNFC.size,
-    nfd_map_size: normalizedMapNFD.size,
-    sample_keys: Object.keys(translations).slice(0, 5)
-  });
+  (window as any).DEBUG_TRANSLATIONS = {
+    total: Object.keys(translations).length,
+    keys: Object.keys(translations).slice(0, 10),
+    test: (name: string) => getEnglishName(name)
+  };
+  console.error('🔍 DEBUG_TRANSLATIONS loaded. Test with: DEBUG_TRANSLATIONS.test("अदुवा")');
 }
 
 export function getEnglishName(nepaliName: string): string {
@@ -130,7 +130,6 @@ export function getEnglishName(nepaliName: string): string {
   
   // Direct lookup first
   if (translations[nepaliName]) {
-    console.log(`Direct lookup match: "${nepaliName}" -> "${translations[nepaliName]}"`);
     return translations[nepaliName];
   }
   
@@ -141,27 +140,21 @@ export function getEnglishName(nepaliName: string): string {
   
   // Try NFC map
   if (normalizedMapNFC.has(nfc)) {
-    const result = normalizedMapNFC.get(nfc) || "";
-    console.log(`NFC lookup match: "${nepaliName}" -> "${result}"`);
-    return result;
+    return normalizedMapNFC.get(nfc) || "";
   }
   
   // Try NFD map
   if (normalizedMapNFD.has(nfd)) {
-    const result = normalizedMapNFD.get(nfd) || "";
-    console.log(`NFD lookup match: "${nepaliName}" -> "${result}"`);
-    return result;
+    return normalizedMapNFD.get(nfd) || "";
   }
   
   // Last resort: try case-insensitive fuzzy matching
   for (const [key, value] of Object.entries(translations)) {
     if (key.trim().toLowerCase() === trimmed.toLowerCase()) {
-      console.log(`Fuzzy lookup match: "${nepaliName}" -> "${value}"`);
       return value;
     }
   }
   
-  console.log(`NO MATCH found for: "${nepaliName}"`);
   return "";
 }
 

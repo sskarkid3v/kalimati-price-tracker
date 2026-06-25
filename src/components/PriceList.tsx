@@ -38,9 +38,6 @@ export default function PriceList({ rawData }: { rawData: TrendData[] }) {
 
     const summaries: ItemSummary[] = [];
     
-    // Log first few items for debugging
-    let debugCount = 0;
-    
     for (const [name, trends] of Object.entries(grouped)) {
       const current = trends[trends.length - 1];
       const previous = trends.length > 1 ? trends[trends.length - 2] : null;
@@ -51,12 +48,6 @@ export default function PriceList({ rawData }: { rawData: TrendData[] }) {
       const price_pct = previous_price !== 0 ? (price_diff / previous_price) * 100 : 0;
       
       const englishName = getEnglishName(name);
-      
-      // Log first 5 items for debugging
-      if (debugCount < 5) {
-        console.log(`Item ${debugCount}: DB name="${name}" | Char codes: ${[...name].map(c => c.charCodeAt(0)).join(',')} | English: "${englishName}"`);
-        debugCount++;
-      }
       
       summaries.push({
         name,
@@ -69,8 +60,6 @@ export default function PriceList({ rawData }: { rawData: TrendData[] }) {
         trends
       });
     }
-    
-    console.log('Total items processed:', summaries.length);
     
     // Sort alphabetically by English name for easier browsing
     return summaries.sort((a, b) => a.name_en.localeCompare(b.name_en));
