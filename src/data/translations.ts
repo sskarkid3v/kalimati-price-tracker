@@ -103,22 +103,43 @@ const translations: Record<string, string> = {
   "हरियो फर्सी(डल्लो)": "Green Pumpkin (Round)",
 };
 
-// Build a normalized lookup map at module load time
-// This handles Unicode normalization (NFC/NFD) differences
-const normalizedMap: Map<string, string> = new Map();
+// Build multiple lookup maps at module load time
+// This handles Unicode normalization (NFC/NFD) differences and whitespace variations
+const normalizedMapNFC: Map<string, string> = new Map();
+const normalizedMapNFD: Map<string, string> = new Map();
+
 for (const [key, value] of Object.entries(translations)) {
-  normalizedMap.set(key.normalize("NFC").trim(), value);
-  normalizedMap.set(key.normalize("NFD").trim(), value);
+  const keyNFC = key.normalize("NFC").trim();
+  const keyNFD = key.normalize("NFD").trim();
+  normalizedMapNFC.set(keyNFC, value);
+  normalizedMapNFD.set(keyNFD, value);
 }
 
 export function getEnglishName(nepaliName: string): string {
+  if (!nepaliName) return "";
+  
   // Direct lookup first
   if (translations[nepaliName]) return translations[nepaliName];
-  // Normalized lookup
+  
+  // Normalized lookups
   const trimmed = nepaliName.trim();
-  return normalizedMap.get(trimmed.normalize("NFC")) 
-      || normalizedMap.get(trimmed.normalize("NFD")) 
-      || "";
+  const nfc = trimmed.normalize("NFC");
+  const nfd = trimmed.normalize("NFD");
+  
+  // Try NFC map
+  if (normalizedMapNFC.has(nfc)) return normalizedMapNFC.get(nfc) || "";
+  
+  // Try NFD map
+  if (normalizedMapNFD.has(nfd)) return normalizedMapNFD.get(nfd) || "";
+  
+  // Last resort: try case-insensitive fuzzy matching
+  for (const [key, value] of Object.entries(translations)) {
+    if (key.trim().toLowerCase() === trimmed.toLowerCase()) {
+      return value;
+    }
+  }
+  
+  return "";
 }
 
 export function searchMatches(nepaliName: string, searchTerm: string): boolean {

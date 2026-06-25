@@ -131,17 +131,15 @@ export default function PriceList({ rawData }: { rawData: TrendData[] }) {
                   onClick={() => setExpandedItem(isExpanded ? null : item.name)}
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-bold text-gray-900 text-base">
-                          {item.name_en || item.name}
-                        </h3>
-                        {item.name_en && (
-                          <span className="text-xs text-gray-500 font-medium">
-                            ({item.name})
-                          </span>
-                        )}
-                      </div>
+                    <div className="flex flex-col gap-0.5">
+                      <h3 className="font-bold text-gray-900 text-base leading-tight">
+                        {item.name_en || item.name}
+                      </h3>
+                      {item.name_en && (
+                        <p className="text-xs text-gray-500 font-normal leading-tight">
+                          {item.name}
+                        </p>
+                      )}
                     </div>
                     <div className="flex items-center gap-3 mt-2">
                       <span className="text-xl font-extrabold text-gray-900">
